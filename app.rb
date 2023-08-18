@@ -15,13 +15,13 @@ helpers do
 end
 
 get '/wishlists' do
-  @wishlists = wishlist_manager.wishlists
+  @wishlists = wishlist_manager.data
   erb :wishlists
 end
 
 get '/wishlists/:id' do
   wishlist_manager.populate_items(params[:id])
-  @items = wishlist_manager.wishlist(params[:id]).items
+  @items = wishlist_manager.by_id(params[:id]).items
   erb :items
 end
 

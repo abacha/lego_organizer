@@ -20,7 +20,9 @@ class Exporter
     @styles[:hcenter] =
       workbook.styles.add_style alignment: { vertical: :center, horizontal: :center, wrap_text: true }
     @styles[:green] =
-      workbook.styles.add_style bg_color: 'C6EFCE', color: '70AD47', type: :dxf
+      workbook.styles.add_style bg_color: 'C6EFCE', color: '006100', type: :dxf
+    @styles[:yellow] =
+      workbook.styles.add_style bg_color: 'FFEB9C', color: '9C5700', type: :dxf
 
   end
 
@@ -29,7 +31,6 @@ class Exporter
       begin
         wm = WishlistManager.instance
         wm.populate_all
-        wm
       end
   end
 
@@ -80,7 +81,7 @@ class Exporter
       end]
 
       i = 0
-      wm.wishlists.each do |wishlist|
+      wm.data.each do |wishlist|
         wishlist.items.each do |item|
           tested_item = ordered_items[item.name]
 
@@ -172,32 +173,39 @@ class Exporter
 
   def generate_sheet_dashboard
     package.workbook.add_worksheet(name: 'Dashboard') do |sheet|
-      sheet.column_widths 30, 6, 6, 6, 6
+      sheet.column_widths 30, 10, 10, 10, 10, 10
 
-      row = sheet.add_row %w[Wishlist Items Rem. Cart Result],
+      row = sheet.add_row %w[Wishlist Items Ordered Rem. Cart Result],
         style: [
           styles[:hleft], styles[:hcenter], styles[:hcenter], styles[:hcenter], styles[:hcenter]
         ]
 
       0.upto(row.size - 1) { |i| row.cells[i].b = true }
-      wm.wishlists.each_with_index do |wishlist, i|
+      wm.data.each_with_index do |wishlist, i|
         sheet.add_row [
           wishlist.name,
           "=SUMIF(Items!$A:$A,$A#{i+2},Items!$E:$E)",
+          "=SUMIF(Items!$A:$A,$A#{i+2},Items!$K:$K)",
           "=SUMIF(Items!$A:$A,$A#{i+2},Items!$M:$M)",
           "=SUMIF(Items!$A:$A,$A#{i+2},Items!$N:$N)",
-          "=C#{i+2}-D#{i+2}"
+          "=D#{i+2}-E#{i+2}"
         ], style: [
-          styles[:hleft], styles[:hcenter], styles[:hcenter], styles[:hcenter], styles[:hcenter]
+          styles[:hleft], styles[:hcenter], styles[:hcenter], styles[:hcenter], styles[:hcenter], styles[:hcenter]
         ]
       end
 
-      sheet.add_conditional_formatting('B:E',
-                                       type: :cellIs,
-                                       operator: :equal,
-                                       formula: '=0',
-                                       dxfId: styles[:green],
-                                       priority: 1)
+      %w[B:B D:D F:F].each do |range|
+        sheet.add_conditional_formatting(range, type: :cellIs,
+                                         operator: :equal,
+                                         formula: '=0',
+                                         dxfId: styles[:green],
+                                         priority: 1)
+        sheet.add_conditional_formatting(range, type: :cellIs,
+                                         operator: :lessThan,
+                                         formula: '6',
+                                         dxfId: styles[:yellow],
+                                         priority: 1)
+      end
     end
   end
 end
