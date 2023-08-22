@@ -18,15 +18,20 @@ class OrderManager
   end
 
   def valid_statuses
-    ['Shipped', 'Payment Received']
+    ['Processed', 'Payment Received', 'Shipped']
   end
 
   def orders
     @orders ||=
       brick_owl.orders.map do |order|
         next unless valid_statuses.include? order[:status]
+        details = brick_owl.order_details(order[:order_id])
         Order.new(
-          *order.values_at(:order_id, :order_date, :status, :url)
+          order[:order_id],
+          order[:order_date],
+          order[:status],
+          order[:url],
+          details[:tracking_number],
         )
       end.compact
   end

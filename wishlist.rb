@@ -1,4 +1,4 @@
-class Wishlist < Struct.new(:id, :name, :url, :item_count, :lot_count, :items)
+class Wishlist < Struct.new(:id, :raw_name, :url, :item_count, :lot_count, :items)
   SET_IMAGES_URL = 'https://images.brickset.com/sets/images'
 
   def initialize(*attrs)
@@ -15,7 +15,33 @@ class Wishlist < Struct.new(:id, :name, :url, :item_count, :lot_count, :items)
   end
 
   def image_url
-    code_set = name.match(/\d{3,4}/)
-    "#{SET_IMAGES_URL}/#{code_set[0]}-1.jpg" if code_set
+    "#{SET_IMAGES_URL}/#{set_number}-1.jpg" if set_number
+  end
+
+  def set_number
+    parsed_name[2] || ''
+  end
+
+  def type
+    if parsed_name[1] == 'b'
+      '(0) Built'
+    elsif parsed_name[1] == 'p'
+      '(1) Prioritized'
+    elsif parsed_name[1] == 'w'
+      '(2) Not Priority'
+    elsif parsed_name[1] == 'z'
+      '(3) Discarded'
+    else
+      '(4) Other'
+    end
+  end
+
+  def name
+    parsed_name[3] || ''
+  end
+
+  private
+  def parsed_name
+    raw_name.match(/(\w)(\d{3,4}) - (.*)/) || []
   end
 end

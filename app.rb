@@ -1,12 +1,18 @@
 require 'rubygems'
 require 'sinatra'
 require_relative 'wishlist_manager'
+require_relative 'collection_manager'
+require_relative 'order_manager'
 require_relative 'exporter'
 RestClient.log = 'stdout'
 
 helpers do
   def wishlist_manager
     WishlistManager.instance
+  end
+
+  def collection_manager
+    CollectionManager.instance
   end
 
   def order_manager
@@ -16,12 +22,29 @@ end
 
 get '/wishlists' do
   @wishlists = wishlist_manager.data
+  @title = 'Wishlists'
   erb :wishlists
+end
+
+get '/collections' do
+  @collections = collection_manager.data
+  @title = 'Collections'
+  erb :collections
+end
+
+get '/collections/:id' do
+  collection_manager.populate_items(params[:id])
+  collection = collection_manager.by_id(params[:id])
+  @items = collection.items
+  @title = collection.name
+  erb :items
 end
 
 get '/wishlists/:id' do
   wishlist_manager.populate_items(params[:id])
-  @items = wishlist_manager.by_id(params[:id]).items
+  wishlist = wishlist_manager.by_id(params[:id])
+  @items = wishlist.items
+  @title = wishlist.name
   erb :items
 end
 
@@ -49,5 +72,6 @@ end
 
 get '/clear_cache' do
   wishlist_manager.flush
+  order_manager.flush
   200
 end

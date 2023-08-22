@@ -177,7 +177,7 @@ class Exporter
 
       row = sheet.add_row %w[Wishlist Items Ordered Rem. Cart Result],
         style: [
-          styles[:hleft], styles[:hcenter], styles[:hcenter], styles[:hcenter], styles[:hcenter]
+          styles[:hleft], styles[:hcenter], styles[:hcenter], styles[:hcenter], styles[:hcenter], styles[:hcenter]
         ]
 
       0.upto(row.size - 1) { |i| row.cells[i].b = true }
@@ -194,13 +194,13 @@ class Exporter
         ]
       end
 
-      %w[B:B D:D F:F].each do |range|
-        sheet.add_conditional_formatting(range, type: :cellIs,
+      %w[B D F].each do |column|
+        sheet.add_conditional_formatting("#{column}2:#{column}#{wm.data.size+1}", type: :cellIs,
                                          operator: :equal,
                                          formula: '=0',
                                          dxfId: styles[:green],
                                          priority: 1)
-        sheet.add_conditional_formatting(range, type: :cellIs,
+        sheet.add_conditional_formatting("#{column}2:#{column}#{wm.data.size+1}", type: :cellIs,
                                          operator: :lessThan,
                                          formula: '6',
                                          dxfId: styles[:yellow],

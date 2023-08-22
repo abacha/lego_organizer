@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'interactive_editor'
 gem 'sinatra'
 gem 'thin'
 gem 'rest-client'

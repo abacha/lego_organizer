@@ -20,21 +20,8 @@ class BaseListManager
   end
 
   def populate_all
-    data.each { |list| populate_items(list.id);break }
+    data.each { |list| populate_items(list.id) }
     self
-  end
-
-  def populate_items(list_id)
-    return if by_id(list_id).items.any?
-
-    lots = brick_owl.list_lots(list_id)
-    boids = lots.map { |lot| lot[:boid] }.join(',')
-    catalog_items = brick_owl.catalog_lookup(boids)
-    list(list_id).items =
-      lots.map do |lot|
-        catalog_item = catalog_items[:items][lot[:boid].to_sym]
-        Item.build(lot, catalog_item)
-      end
   end
 
   def with_item(item)

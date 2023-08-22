@@ -24,6 +24,9 @@
               <a class="nav-link" href="/wishlists">Wishlists</a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="/collections">Collections</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="/orders">Orders</a>
             </li>
             <li class="nav-item">
@@ -43,6 +46,7 @@
         <%if @error then %>
           <div class="alert alert-error"><%=@error%></div>
         <% end %>
+        <h2><%= @title %></h2>
         <%= yield %>
       </div>
 

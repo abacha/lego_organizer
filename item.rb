@@ -12,7 +12,7 @@ class Item < Struct.new(:boid, :item_number, :type, :category, :qty, :color, :na
       item_number ? item_number[:id] : nil,
       item_type(catalog_item),
       catalog_item[:cat_name_path],
-      lot[:qty].to_i,
+      (lot[:qty] || lot[:quantity]).to_i,
       catalog_item[:color_name],
       catalog_item[:name],
       image,

@@ -7,13 +7,23 @@ require 'dalli'
 
 class BrickOwl
   API_KEY='b3d241b002a40564c021078b7256faab0bf1acbefa36ded0968b5824d640e3a3'
+  BASE_URL = 'https://api.brickowl.com/v1/'
+  MAX_BOIDS = 50
+
 
   def cache
-    @cache ||= Dalli::Client.new('localhost:11211', namespace: "brickowl" , expires_in: 900)
+    @cache ||= Dalli::Client.new('localhost:11211',
+                                 namespace: 'brickowl',
+                                 expires_in: 900)
   end
 
   def catalog_lookup(boids)
-    get 'catalog/bulk_lookup', boids: boids
+    items = {}
+    boids.each_slice(MAX_BOIDS) do |slice|
+      response = get('catalog/bulk_lookup', boids: slice.join(','))
+      items.merge!(response[:items])
+    end
+    items
   end
 
   def wishlist_lots(wishlist_id)
@@ -28,8 +38,17 @@ class BrickOwl
     get 'order/list', list_type: :customer
   end
 
+  def order_details(order_id)
+    get 'order/view', order_id: order_id
+  end
+
   def order_items(order_id)
     get 'order/items', order_id: order_id
+  end
+
+  def inventory(boid)
+    response = get('catalog/inventory', boid: boid)
+    response[:inventory]
   end
 
   private
@@ -37,8 +56,7 @@ class BrickOwl
   def get(url, params = {})
     params.merge!(key: API_KEY)
     params_string = params.map { |key, value| "#{key}=#{value}" }.join('&')
-    base_url = 'https://api.brickowl.com/v1/'
-    request_url = base_url + url + "?#{params_string}"
+    request_url = "#{BASE_URL}#{url}?#{params_string}"
 
     data = request(request_url)
     JSON.parse(data, symbolize_names: true)
