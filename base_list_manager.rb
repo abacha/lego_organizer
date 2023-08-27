@@ -20,13 +20,20 @@ class BaseListManager
   end
 
   def populate_all
-    data.each { |list| populate_items(list.id) }
+    data.each { |list| Thread.new { populate_items(list.id) } }.join
     self
   end
 
   def with_item(item)
-    data.select { |list| list.items.map(&:name).include?(item.name) }.
-      map(&:name)
+    data.select { |list| list.items.map(&:boid).include?(item.boid) }
+  end
+
+  def intersect(id_1, id_2)
+    populate_items(id_1)
+    populate_items(id_2)
+    by_id(id_1).items.select do |origin|
+      by_id(id_2).items.map(&:boid).include? origin.boid
+    end
   end
 
   def grouped_items

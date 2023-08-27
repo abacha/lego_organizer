@@ -18,7 +18,7 @@ class WishlistManager < BaseListManager
           wishlist[:item_count],
           wishlist[:lot_count]
         )
-      end.compact.sort_by(&:name)
+      end.compact.sort_by(&:type)
   end
 
   def populate_items(wishlist_id)

@@ -1,28 +1,19 @@
 require 'singleton'
 require 'caxlsx'
 
-require_relative 'brick_owl'
+require_relative 'base_list_manager'
 require_relative 'order'
 require_relative 'item'
 
-class OrderManager
+class OrderManager < BaseListManager
   include Singleton
-
-  def brick_owl
-    @brick_owl ||= BrickOwl.new
-  end
-
-  def flush
-    brick_owl.cache.flush_all
-    @orders = nil
-  end
 
   def valid_statuses
     ['Processed', 'Payment Received', 'Shipped']
   end
 
-  def orders
-    @orders ||=
+  def data
+    @data ||=
       brick_owl.orders.map do |order|
         next unless valid_statuses.include? order[:status]
         details = brick_owl.order_details(order[:order_id])
@@ -36,19 +27,11 @@ class OrderManager
       end.compact
   end
 
-  def order(id)
-    orders.detect { |order| order.id == id.to_s }
-  end
-
-  def populate_all
-    orders.each { |order| populate_items(order.id) }
-  end
-
   def populate_items(order_id)
-    return if order(order_id).items.any?
+    return if by_id(order_id).items.any?
 
     order_items = brick_owl.order_items(order_id)
-    order(order_id).items =
+    by_id(order_id).items =
       order_items.map do |order_item|
         Item.new(
           order_item[:boid],
@@ -62,19 +45,5 @@ class OrderManager
           nil
         )
       end
-  end
-
-  def grouped_items
-    orders.each { |order| populate_items(order.id) }
-    items = orders.map(&:items).flatten
-
-    items.inject(Hash.new) do |hash, element|
-      if hash[element[:name]]
-        hash[element[:name]].qty += element.qty
-      else
-        hash[element[:name]] = element.clone
-      end
-      hash
-    end.values
   end
 end

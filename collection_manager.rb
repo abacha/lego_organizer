@@ -10,11 +10,16 @@ class CollectionManager < BaseListManager
 
   def data
     @data ||=
-      brick_owl.wishlist_lots(LIST_ID).map do |set|
-        boid = set[:boid]
-        set_number = set[:ids].detect { |id| id[:type] == "set_number" }[:id].gsub(/-1/, '')
-        url = "https://brickowl.com/catalog/#{boid}"
-        Wishlist.new(boid, set_number, url)
+      begin
+        lots = brick_owl.wishlist_lots(LIST_ID)
+        boids = lots.map { |lot| lot[:boid] }
+        catalog = brick_owl.catalog_lookup(boids)
+
+        lots.map do |set|
+          boid = set[:boid]
+          set_number = set[:ids].detect { |id| id[:type] == "set_number" }[:id].gsub(/-1/, '')
+          Wishlist.new(boid, "s#{set_number} - #{catalog[boid.to_sym][:name]}", catalog[:url])
+        end
       end
   end
 

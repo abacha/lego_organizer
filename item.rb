@@ -1,6 +1,7 @@
 class Item < Struct.new(:boid, :item_number, :type, :category, :qty, :color, :name, :image, :url)
   def initialize(*)
     super
+    self.name.gsub!('LEGO ', '') if name
     self.qty ||= 0
   end
 
@@ -14,7 +15,7 @@ class Item < Struct.new(:boid, :item_number, :type, :category, :qty, :color, :na
       catalog_item[:cat_name_path],
       (lot[:qty] || lot[:quantity]).to_i,
       catalog_item[:color_name],
-      catalog_item[:name],
+      catalog_item[:name].gsub('LEGO ', ''),
       image,
       catalog_item[:url]
     )

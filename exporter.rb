@@ -27,20 +27,11 @@ class Exporter
   end
 
   def wm
-    @wm ||=
-      begin
-        wm = WishlistManager.instance
-        wm.populate_all
-      end
+    @wm ||= WishlistManager.instance.populate_all
   end
 
-  def orders
-    @orders ||=
-      begin
-        om = OrderManager.instance
-        om.populate_all
-        om.orders
-      end
+  def om
+    @om ||= OrderManager.instance.populate_all
   end
 
   def generate_spreadsheet
@@ -75,10 +66,7 @@ class Exporter
 
       0.upto(row.size - 1) { |i| row.cells[i].b = true }
 
-
-      ordered_items = Hash[OrderManager.instance.grouped_items.map do |item|
-        [item.name, item.qty.to_i]
-      end]
+      ordered_items = Hash[om.grouped_items.map { |item| [item.name, item.qty] }]
 
       i = 0
       wm.data.each do |wishlist|
@@ -96,7 +84,7 @@ class Exporter
           ordered_items[item.name] -= bought_qty if bought_qty
 
           sheet.add_row [
-            wishlist.name,
+            wishlist.raw_name,
             item.name.gsub('LEGO ', ''),
             item.item_number,
             item.boid,
@@ -137,7 +125,7 @@ class Exporter
     workbook.add_worksheet(name: 'Order Items') do |sheet|
       row = sheet.add_row %w[Order Name Type Color BOID Qty], style: styles[:hleft]
       0.upto(row.size - 1) { |i| row.cells[i].b = true }
-      orders.each do |order|
+      om.orders.each do |order|
         order.items.each do |item|
           sheet.add_row [
             order.id,
@@ -158,7 +146,7 @@ class Exporter
       row = sheet.add_row %w[Id Date Status Link], style: styles[:hleft]
 
       0.upto(row.size - 1) { |i| row.cells[i].b = true }
-      orders.each do |order|
+      om.orders.each do |order|
         sheet.add_row [
           order.id,
           order.date,
@@ -183,7 +171,7 @@ class Exporter
       0.upto(row.size - 1) { |i| row.cells[i].b = true }
       wm.data.each_with_index do |wishlist, i|
         sheet.add_row [
-          wishlist.name,
+          wishlist.raw_name,
           "=SUMIF(Items!$A:$A,$A#{i+2},Items!$E:$E)",
           "=SUMIF(Items!$A:$A,$A#{i+2},Items!$K:$K)",
           "=SUMIF(Items!$A:$A,$A#{i+2},Items!$M:$M)",

@@ -4,6 +4,7 @@ require_relative 'wishlist_manager'
 require_relative 'collection_manager'
 require_relative 'order_manager'
 require_relative 'exporter'
+require_relative 'dashboard'
 RestClient.log = 'stdout'
 
 helpers do
@@ -17,6 +18,14 @@ helpers do
 
   def order_manager
     OrderManager.instance
+  end
+
+  def text_class(n)
+    if n == 0
+      'bg-success'
+    elsif n < 6
+      'bg-warning'
+    end
   end
 end
 
@@ -48,6 +57,11 @@ get '/wishlists/:id' do
   erb :items
 end
 
+get '/wishlists/intersect/:origin/:target' do
+  @items = wishlist_manager.intersect(params[:origin], params[:target])
+  erb :items
+end
+
 get '/items' do
   @items = wishlist_manager.grouped_items
 
@@ -55,7 +69,7 @@ get '/items' do
 end
 
 get '/orders' do
-  @orders = order_manager.orders
+  @orders = order_manager.data
   erb :orders
 end
 
@@ -74,4 +88,9 @@ get '/clear_cache' do
   wishlist_manager.flush
   order_manager.flush
   200
+end
+
+get '/' do
+  @dashboard = Dashboard.new.generate
+  erb :dashboard
 end

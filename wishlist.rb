@@ -30,7 +30,7 @@ class Wishlist < Struct.new(:id, :raw_name, :url, :item_count, :lot_count, :item
     elsif parsed_name[1] == 'w'
       '(2) Not Priority'
     elsif parsed_name[1] == 'z'
-      '(3) Discarded'
+      '(3) Buckets'
     else
       '(4) Other'
     end
