@@ -17,6 +17,10 @@ class BrickOwl
                                  expires_in: 900)
   end
 
+  def lookup(boid)
+    get('catalog/lookup', boid: boid)
+  end
+
   def catalog_lookup(boids)
     items = {}
     boids.each_slice(MAX_BOIDS) do |slice|
@@ -66,7 +70,6 @@ class BrickOwl
     cache.get(url) ||
       begin
         response = RestClient.get(url).body
-        puts "Cached: #{url}"
         cache.set(url, response, 300)
         response
       end

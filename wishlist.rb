@@ -40,6 +40,11 @@ class Wishlist < Struct.new(:id, :raw_name, :url, :item_count, :lot_count, :item
     parsed_name[3] || ''
   end
 
+
+  def item(item)
+    items.detect { |list_item| item.boid == list_item.boid }
+  end
+
   private
   def parsed_name
     raw_name.match(/(\w)(\d{3,4}) - (.*)/) || []

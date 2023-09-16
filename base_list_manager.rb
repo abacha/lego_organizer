@@ -25,7 +25,7 @@ class BaseListManager
   end
 
   def with_item(item)
-    data.select { |list| list.items.map(&:boid).include?(item.boid) }
+    data.select { |list| list.item(item) }
   end
 
   def intersect(id_1, id_2)

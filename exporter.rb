@@ -125,7 +125,7 @@ class Exporter
     workbook.add_worksheet(name: 'Order Items') do |sheet|
       row = sheet.add_row %w[Order Name Type Color BOID Qty], style: styles[:hleft]
       0.upto(row.size - 1) { |i| row.cells[i].b = true }
-      om.orders.each do |order|
+      om.data.each do |order|
         order.items.each do |item|
           sheet.add_row [
             order.id,
@@ -146,7 +146,7 @@ class Exporter
       row = sheet.add_row %w[Id Date Status Link], style: styles[:hleft]
 
       0.upto(row.size - 1) { |i| row.cells[i].b = true }
-      om.orders.each do |order|
+      om.data.each do |order|
         sheet.add_row [
           order.id,
           order.date,

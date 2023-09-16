@@ -30,8 +30,7 @@ class WishlistManager < BaseListManager
     catalog_items = brick_owl.catalog_lookup(boids)
     wishlist.items =
       lots.map do |lot|
-        catalog_item = catalog_items[lot[:boid].to_sym]
-        Item.build(lot, catalog_item)
+        Item.build(catalog_items[lot[:boid].to_sym], lot)
       end
   end
 end

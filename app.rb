@@ -3,6 +3,7 @@ require 'sinatra'
 require_relative 'wishlist_manager'
 require_relative 'collection_manager'
 require_relative 'order_manager'
+require_relative 'item_manager'
 require_relative 'exporter'
 require_relative 'dashboard'
 RestClient.log = 'stdout'
@@ -18,6 +19,10 @@ helpers do
 
   def order_manager
     OrderManager.instance
+  end
+
+  def item_manager
+    ItemManager.instance
   end
 
   def text_class(n)
@@ -36,6 +41,7 @@ get '/wishlists' do
 end
 
 get '/collections' do
+  collection_manager.populate_all
   @collections = collection_manager.data
   @title = 'Collections'
   erb :collections
@@ -68,6 +74,14 @@ get '/items' do
   erb :items
 end
 
+get '/items/:boid' do
+  @item = item_manager.lookup(params[:boid])
+  @wishlists = wishlist_manager.with_item(@item)
+  @collections = collection_manager.with_item(@item)
+
+  erb :item
+end
+
 get '/orders' do
   @orders = order_manager.data
   erb :orders
@@ -75,7 +89,7 @@ end
 
 get '/orders/:id' do
   order_manager.populate_items(params[:id])
-  @items = order_manager.order(params[:id]).items
+  @items = order_manager.by_id(params[:id]).items
   erb :items
 end
 

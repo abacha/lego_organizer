@@ -5,15 +5,15 @@ class Item < Struct.new(:boid, :item_number, :type, :category, :qty, :color, :na
     self.qty ||= 0
   end
 
-  def self.build(lot, catalog_item)
+  def self.build(catalog_item, lot = nil)
     image = catalog_item[:images].any? ? catalog_item[:images][0][:small] : nil
     item_number = catalog_item[:ids].detect { |id_type| id_type[:type] == 'item_no' }
     new(
-      lot[:boid],
+      catalog_item[:boid],
       item_number ? item_number[:id] : nil,
       item_type(catalog_item),
       catalog_item[:cat_name_path],
-      (lot[:qty] || lot[:quantity]).to_i,
+      lot ? (lot[:qty] || lot[:quantity]).to_i : nil,
       catalog_item[:color_name],
       catalog_item[:name].gsub('LEGO ', ''),
       image,

@@ -12,25 +12,26 @@
       <th scope="col" class="col-md-1"></th>
     </tr>
   </thead>
-  <% @items.each do |item| %>
-    <tr>
-      <td class="small"><%= item.name %></td>
-      <td><%= item.boid %></td>
-      <td class="small"><%= item.qty %></td>
-      <td class="small"><%= item.color %></td>
-      <td class="small"><%= item.type %></td>
-      <td class="small"><%= item.category %></td>
-      <td class="small">
-        <% wishlist_manager.with_item(item).map do |wishlist|  %>
-          <%= wishlist.name %><br />
-        <% end %>
-      </td>
-      <td><img src="<%= item.image %>" /></td>
-      <td>
-        <a target="_blank"href="/items/<%= item.boid %>">View</a>
-        <a target="_blank"href="<%= item.url %>">BrickOwl</a>
-      </td>
-    </tr>
-  <% end %>
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td class="small"><%= item.name %></td>
+        <td><%= item.boid %></td>
+        <td class="small"><%= item.qty %></td>
+        <td class="small"><%= item.color %></td>
+        <td class="small"><%= item.type %></td>
+        <td class="small"><%= item.category %></td>
+        <td class="small">
+          <% wishlist_manager.with_item(item).map do |wishlist|  %>
+            <%= wishlist.name %><br />
+          <% end %>
+        </td>
+        <td><img src="<%= item.image %>" /></td>
+        <td>
+          <a target="_blank"href="/items/<%= item.boid %>">View</a>
+          <a target="_blank"href="<%= item.url %>">BrickOwl</a>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
 </div>
-
